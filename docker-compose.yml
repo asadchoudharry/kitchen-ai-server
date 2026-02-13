@@ -3,7 +3,7 @@ services:
     image: localai/localai:latest-aio-cpu
     container_name: localai
     ports:
-      - "8080:8080"
+      - "18080:8080"
     volumes:
       - localai-models:/models
     restart: unless-stopped
