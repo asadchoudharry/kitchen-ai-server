@@ -7,6 +7,23 @@ services:
     volumes:
       - localai-models:/models
     restart: unless-stopped
+    networks:
+      - dokploy-network
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+
+      - traefik.http.routers.ai-web.rule=Host(`ai.rektrs.com`)
+      - traefik.http.routers.ai-web.entrypoints=web
+      - traefik.http.routers.ai-web.middlewares=redirect-to-https@file
+
+      - traefik.http.routers.ai-websecure.rule=Host(`ai.rektrs.com`)
+      - traefik.http.routers.ai-websecure.entrypoints=websecure
+      - traefik.http.routers.ai-websecure.tls.certresolver=letsencrypt
+
+      - traefik.http.services.ai.loadbalancer.server.port=8080
+      - traefik.http.routers.ai-websecure.service=ai
+      - traefik.http.routers.ai-web.service=ai
 
   yolo:
     build:
@@ -18,7 +35,25 @@ services:
     volumes:
       - yolo-models:/app/models
     restart: unless-stopped
+    networks:
+      - dokploy-network
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.vision-web.rule=Host(`vision.rektrs.com`)
+      - traefik.http.routers.vision-web.entrypoints=web
+      - traefik.http.routers.vision-web.middlewares=redirect-to-https@file
+      - traefik.http.routers.vision-websecure.rule=Host(`vision.rektrs.com`)
+      - traefik.http.routers.vision-websecure.entrypoints=websecure
+      - traefik.http.routers.vision-websecure.tls.certresolver=letsencrypt
+      - traefik.http.services.vision.loadbalancer.server.port=8000
+      - traefik.http.routers.vision-websecure.service=vision
+      - traefik.http.routers.vision-web.service=vision
 
 volumes:
   localai-models:
   yolo-models:
+
+networks:
+  dokploy-network:
+    external: true
