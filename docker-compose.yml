@@ -1,0 +1,24 @@
+services:
+  localai:
+    image: localai/localai:latest-aio-cpu
+    container_name: localai
+    ports:
+      - "8080:8080"
+    volumes:
+      - localai-models:/models
+    restart: unless-stopped
+
+  yolo:
+    build:
+      context: ./yolo-api
+      dockerfile: Dockerfile
+    container_name: yolo-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - yolo-models:/app/models
+    restart: unless-stopped
+
+volumes:
+  localai-models:
+  yolo-models:
